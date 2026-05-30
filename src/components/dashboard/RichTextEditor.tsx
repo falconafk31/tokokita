@@ -4,10 +4,12 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import { useEffect, useRef, useState } from 'react'
+import { useToast } from '@/components/shared/Toast'
 
 export default function RichTextEditor({ content, onChange }: { content: string, onChange: (c: string) => void }) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
 
   const editor = useEditor({
     extensions: [
@@ -62,7 +64,7 @@ export default function RichTextEditor({ content, onChange }: { content: string,
       
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Gagal mengunggah gambar. Pastikan bucket Supabase sudah dikonfigurasi.')
+      toast('Gagal mengunggah gambar. Pastikan bucket Supabase sudah dikonfigurasi.', 'error')
     } finally {
       setIsUploading(false)
       // Reset input

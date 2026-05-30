@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from "next";
 import { Nunito, Playfair_Display } from "next/font/google";
 import Script from "next/script";
+import { ToastProvider } from "@/components/shared/Toast";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -59,7 +60,9 @@ export default async function RootLayout({
             </noscript>
           </>
         )}
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

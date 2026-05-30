@@ -3,9 +3,11 @@
 import { useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 import { bulkInsertArticles } from '@/app/(dashboard)/dashboard/articles/actions'
+import { useToast } from '@/components/shared/Toast'
 
 export default function BulkUploadArticles() {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +25,7 @@ export default function BulkUploadArticles() {
         const data = XLSX.utils.sheet_to_json(ws)
 
         if (data.length === 0) {
-          alert("File Excel kosong!")
+          toast("File Excel kosong!", 'error')
           setLoading(false)
           return
         }
@@ -49,13 +51,13 @@ export default function BulkUploadArticles() {
 
         const res = await bulkInsertArticles(formattedData)
         if (res.error) {
-          alert('Gagal mengunggah artikel: ' + res.error)
+          toast('Gagal mengunggah artikel: ' + res.error, 'error')
         } else {
-          alert(`Berhasil mengunggah ${formattedData.length} artikel!`)
+          toast(`Berhasil mengunggah ${formattedData.length} artikel!`, 'success')
         }
       } catch (err) {
         console.error(err)
-        alert('Terjadi kesalahan saat membaca file Excel.')
+        toast('Terjadi kesalahan saat membaca file Excel.', 'error')
       } finally {
         setLoading(false)
         if (fileInputRef.current) fileInputRef.current.value = ''

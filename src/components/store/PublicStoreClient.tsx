@@ -76,10 +76,10 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
-        {filtered.slice(0, displayLimit).map(p => (
+        {filtered.slice(0, displayLimit).map((p, index) => (
           <Link key={p.id} href={`/${p.slug || p.id}`} className="block bg-white rounded-2xl overflow-hidden cursor-pointer border border-[#f0f0f0] transition-all hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(238,77,45,0.18)] shadow-[0_2px_12px_rgba(0,0,0,0.08)] group">
             <div className="relative bg-[#fafafa] aspect-square">
-              <Image src={p.image_url} alt={p.name} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
+              <Image src={p.image_url} alt={p.name} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" priority={index < 4} />
               <div className={`absolute top-2.5 left-2.5 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md tracking-wider
                 ${p.badge === 'TERLARIS' ? 'bg-[#EE4D2D]' : p.badge === 'HOT 🔥' ? 'bg-[#FF6B35]' : p.badge === 'BARU' ? 'bg-[#00B14F]' : 'bg-[#333]'}`}>
                 {p.badge || 'BARU'}

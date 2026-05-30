@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import ArticleContent from './ArticleContent'
 import SidebarProducts from '@/components/store/SidebarProducts'
+import ScrollProgress from '@/components/shared/ScrollProgress'
+import ShareButtons from '@/components/shared/ShareButtons'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
@@ -63,8 +65,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   })
 
+  const wordCount = (article.content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200))
+
   return (
     <div className="font-nunito bg-[#fdfdfd]">
+      <ScrollProgress />
       
       {/* Hero Image Section (If Available) */}
       {article.image_url && (
@@ -92,14 +98,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div>
             {/* Article Header */}
             <div className="text-center lg:text-left mb-10">
-              <div className="text-[#EE4D2D] text-[13px] font-bold uppercase tracking-widest mb-4">
-                Kesehatan & Gaya Hidup
-              </div>
+              {/* Category removed (OPT-2) */}
               <h1 className="font-playfair text-[36px] md:text-[48px] font-black leading-[1.1] text-[#1a1a1a] mb-6">
                 {article.title}
               </h1>
-              <div className="flex items-center justify-center lg:justify-start gap-3 text-[#999] text-[14px]">
+              <div className="flex items-center justify-center lg:justify-start gap-3 text-[#999] text-[14px] font-bold">
                 <span>{formattedDate}</span>
+                <span>•</span>
+                <span>📖 {readingTime} menit baca</span>
               </div>
             </div>
             
@@ -118,6 +124,29 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <ArticleContent product={article.product} />
                 </div>
               )}
+
+              {/* Share Buttons (OPT-8) */}
+              <div className="mt-12 pt-8 border-t border-[#f0f0f0]">
+                <ShareButtons url={`/blog/${article.slug}`} title={article.title} />
+              </div>
+            </div>
+
+            {/* Mobile Products Section (OPT-6) */}
+            <div className="lg:hidden mb-16">
+              <h3 className="text-[20px] font-black mb-5 font-playfair text-[#1a1a1a]">🔥 Produk Populer</h3>
+              <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
+                {trendingProducts?.map(p => (
+                  <Link key={p.id} href={`/${p.slug || p.id}`} className="snap-start min-w-[200px] w-[200px] bg-white rounded-2xl border border-[#f0f0f0] overflow-hidden shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:border-[#EE4D2D] transition-colors">
+                    <div className="relative aspect-square bg-[#fafafa]">
+                      <Image src={p.image_url} alt={p.name} fill sizes="200px" className="object-cover" />
+                    </div>
+                    <div className="p-4">
+                      <div className="text-[13px] font-bold text-[#1a1a1a] leading-tight line-clamp-2 mb-2 h-[34px]">{p.name}</div>
+                      <div className="text-[#EE4D2D] font-black text-[15px]">Rp {p.price.toLocaleString('id-ID')}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 

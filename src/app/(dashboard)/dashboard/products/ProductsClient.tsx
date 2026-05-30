@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { upsertProduct, deleteProduct } from './actions'
 import BulkUploadProducts from '@/components/dashboard/BulkUploadProducts'
 import ConfirmModal from '@/components/shared/ConfirmModal'
@@ -16,6 +17,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
   const [editData, setEditData] = useState<any>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [sortBy, setSortBy] = useState('newest') // newest, oldest
+  const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemToDelete, setItemToDelete] = useState<string | null>(null)
   const ITEMS_PER_PAGE = 10
@@ -26,8 +28,12 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
     return sortBy === 'newest' ? timeB - timeA : timeA - timeB
   })
 
-  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / ITEMS_PER_PAGE))
-  const currentProducts = sortedProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+  const filteredProducts = sortedProducts.filter(p =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE))
+  const currentProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
   const EMPTY = {
     name: "", category: "Fashion", price: "", original_price: "",
@@ -85,6 +91,13 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
             <option value="newest">Tanggal Terbaru</option>
             <option value="oldest">Tanggal Terlama</option>
           </select>
+          <input 
+            type="text" 
+            placeholder="Cari produk..."
+            value={searchQuery}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            className="p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337] bg-white min-w-[200px]"
+          />
         </div>
         <div className="flex items-center gap-2">
           <BulkUploadProducts />
@@ -114,7 +127,9 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                      <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
+                        <Image src={p.image_url} alt={p.name} fill sizes="40px" className="object-cover" />
+                      </div>
                       <div className="text-[13px] font-bold text-[#1a1a1a] max-w-[160px] line-clamp-2">
                         {p.name}
                       </div>
@@ -160,7 +175,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
         {totalPages > 1 && (
           <div className="p-4 border-t border-[#f0f0f0] flex items-center justify-between bg-white">
             <div className="text-[13px] text-[#666] font-bold">
-              Menampilkan {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length)} dari {sortedProducts.length} produk
+              Menampilkan {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} dari {filteredProducts.length} produk
             </div>
             <div className="flex gap-2">
               <button 

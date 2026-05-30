@@ -69,3 +69,27 @@ body {
 .tiptap-editor em {
   font-style: italic;
 }
+
+
+/* Micro-interactions (OPT-14) */
+button, a[role='button'] {
+  transition: transform 0.15s ease;
+}
+button:active, a[role='button']:active {
+  transform: scale(0.97);
+}
+
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.15);
+  border-color: #FF7337;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

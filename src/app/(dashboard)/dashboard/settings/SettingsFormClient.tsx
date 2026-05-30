@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateSettings } from './actions'
+import { useToast } from '@/components/shared/Toast'
 
 export default function SettingsFormClient({ initialData }: { initialData: any }) {
   const router = useRouter()
+  const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [form, setForm] = useState({
     shop_name: initialData?.shop_name || 'TokoKita',
@@ -17,7 +19,7 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
     setIsSaving(true)
     await updateSettings(form)
     setIsSaving(false)
-    alert('Pengaturan berhasil disimpan!')
+    toast('Pengaturan berhasil disimpan!', 'success')
     router.refresh()
   }
 

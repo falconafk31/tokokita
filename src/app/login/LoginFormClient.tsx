@@ -6,6 +6,7 @@ import { loginAction } from './actions'
 export default function LoginFormClient() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true)
@@ -20,7 +21,7 @@ export default function LoginFormClient() {
   }
 
   return (
-    <form action={handleSubmit} method="POST" className="flex flex-col gap-4 font-nunito">
+    <form action={handleSubmit} className="flex flex-col gap-4 font-nunito">
       {error && (
         <div className="bg-[#fff1f0] text-[#EE4D2D] p-3 rounded-xl text-[13px] font-bold text-center">
           {error}
@@ -40,13 +41,22 @@ export default function LoginFormClient() {
 
       <div>
         <label className="text-[12px] font-bold text-[#666] block mb-1.5">Password</label>
-        <input 
-          type="password" 
-          name="password"
-          required
-          className="w-full p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337] bg-[#fafafa] focus:bg-white transition-all" 
-          placeholder="••••••••" 
-        />
+        <div className="relative">
+          <input 
+            type={showPassword ? "text" : "password"} 
+            name="password"
+            required
+            className="w-full p-3 pr-10 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337] bg-[#fafafa] focus:bg-white transition-all" 
+            placeholder="••••••••" 
+          />
+          <button 
+            type="button" 
+            onClick={() => setShowPassword(p => !p)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#333] transition-colors"
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </button>
+        </div>
       </div>
 
       <button 

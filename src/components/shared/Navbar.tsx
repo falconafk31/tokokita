@@ -2,9 +2,20 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const links = [
     { href: '/', label: 'Beranda' },
@@ -12,8 +23,8 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#f0f0f0]/80 shadow-[0_4px_30px_rgba(0,0,0,0.03)] font-nunito transition-all duration-300">
-      <div className="max-w-[1100px] mx-auto px-5 h-[70px] flex items-center justify-between gap-6">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg font-nunito transition-all duration-300 ${scrolled ? 'border-b border-[#f0f0f0]/80 shadow-[0_4px_30px_rgba(0,0,0,0.06)]' : 'border-transparent shadow-none'}`}>
+      <div className={`max-w-[1100px] mx-auto px-5 flex items-center justify-between gap-6 transition-all duration-300 ${scrolled ? 'h-[60px]' : 'h-[70px]'}`}>
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -43,11 +54,6 @@ export default function Navbar() {
               </Link>
             )
           })}
-        </div>
-
-        {/* Spacer for right side */}
-        <div className="flex flex-1 md:flex-none items-center justify-end gap-3 min-w-[50px]">
-          {/* We can add future actions here like dark mode toggle or cart */}
         </div>
 
       </div>

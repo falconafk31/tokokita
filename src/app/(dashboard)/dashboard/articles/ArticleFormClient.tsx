@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { upsertArticle } from './actions'
+import { useToast } from '@/components/shared/Toast'
 import dynamic from 'next/dynamic'
 
 const RichTextEditor = dynamic(() => import('@/components/dashboard/RichTextEditor'), { 
@@ -12,6 +13,7 @@ const RichTextEditor = dynamic(() => import('@/components/dashboard/RichTextEdit
 
 export default function ArticleFormClient({ initialData, products }: { initialData?: any, products: any[] }) {
   const router = useRouter()
+  const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [form, setForm] = useState({
     id: initialData?.id || undefined,
@@ -27,12 +29,13 @@ export default function ArticleFormClient({ initialData, products }: { initialDa
   })
 
   const handleSave = async (published: boolean) => {
-    if (!form.title) return alert('Judul wajib diisi')
+    if (!form.title) return toast('Judul wajib diisi', 'error')
     
     setIsSaving(true)
     const payload = { ...form, published, product_id: form.product_id || null }
     await upsertArticle(payload)
     setIsSaving(false)
+    toast(published ? 'Artikel berhasil di-publish!' : 'Draft berhasil disimpan!', 'success')
     router.push('/dashboard/articles')
   }
 

@@ -1,4 +1,5 @@
 import Navbar from '@/components/shared/Navbar'
+import BackToTop from '@/components/shared/BackToTop'
 import Link from 'next/link'
 
 export default function PublicLayout({
@@ -28,6 +29,7 @@ export default function PublicLayout({
           </div>
         </div>
       </footer>
+      <BackToTop />
     </div>
   )
 }

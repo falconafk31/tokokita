@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Topbar from '@/components/dashboard/Topbar'
 import RecentClicksClient from '@/components/dashboard/RecentClicksClient'
+import Image from 'next/image'
 
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 
@@ -103,7 +104,9 @@ export default async function AnalyticsPage() {
               {topProducts.map((p: any, i: number) => (
                 <div key={p.id} className="flex items-center gap-4">
                   <div className="w-6 text-center font-bold text-[#999] text-[13px]">#{i + 1}</div>
-                  <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-xl object-cover shadow-sm" />
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm shrink-0">
+                    <Image src={p.image_url} alt={p.name} fill sizes="48px" className="object-cover" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-bold text-[#1a1a1a] truncate mb-1.5">{p.name}</div>
                     <div className="h-2 rounded-full bg-[#f0f0f0] overflow-hidden">

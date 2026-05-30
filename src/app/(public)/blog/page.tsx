@@ -14,7 +14,7 @@ export default async function BlogIndexPage() {
 
   const { data: articles } = await supabase
     .from('articles')
-    .select('id, title, slug, meta_desc, image_url, created_at')
+    .select('id, title, slug, content, meta_desc, image_url, created_at')
     .eq('published', true)
     .order('created_at', { ascending: false })
 
@@ -29,6 +29,11 @@ export default async function BlogIndexPage() {
 
   const featuredArticle = articles[0]
   const otherArticles = articles.slice(1)
+
+  const getReadingTime = (content: string) => {
+    const wordCount = (content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
+    return Math.max(1, Math.ceil(wordCount / 200))
+  }
 
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-10 font-nunito">
@@ -54,8 +59,13 @@ export default async function BlogIndexPage() {
             )}
           </div>
           <div className="md:pr-10">
-            <div className="inline-block px-3 py-1 rounded-full bg-[#EE4D2D]/10 text-[#EE4D2D] text-[12px] font-bold mb-4">
-              ARTIKEL TERBARU
+            <div className="flex items-center gap-3 mb-4">
+              <div className="inline-block px-3 py-1 rounded-full bg-[#EE4D2D]/10 text-[#EE4D2D] text-[12px] font-bold">
+                ARTIKEL TERBARU
+              </div>
+              <div className="text-[#999] text-[12px] font-bold">
+                📖 {getReadingTime(featuredArticle.content)} menit baca
+              </div>
             </div>
             <h2 className="text-[28px] md:text-[36px] font-black text-[#1a1a1a] font-playfair leading-tight mb-4 group-hover:text-[#EE4D2D] transition-colors">
               {featuredArticle.title}

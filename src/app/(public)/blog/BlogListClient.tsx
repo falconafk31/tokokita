@@ -9,6 +9,11 @@ export default function BlogListClient({ articles }: { articles: any[] }) {
 
   if (!articles || articles.length === 0) return null
 
+  const getReadingTime = (content: string) => {
+    const wordCount = (content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
+    return Math.max(1, Math.ceil(wordCount / 200))
+  }
+
   return (
     <>
       <h3 className="text-[24px] font-black text-[#1a1a1a] mb-8 font-playfair border-b border-[#e5e5e5] pb-4">
@@ -24,8 +29,10 @@ export default function BlogListClient({ articles }: { articles: any[] }) {
                 <div className="w-full h-full flex items-center justify-center text-[48px]">📰</div>
               )}
             </div>
-            <div className="text-[#999] text-[12px] font-bold mb-2">
-              {new Date(article.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+            <div className="flex items-center gap-2 text-[#999] text-[12px] font-bold mb-2">
+              <span>{new Date(article.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span>•</span>
+              <span>📖 {getReadingTime(article.content)} menit baca</span>
             </div>
             <h4 className="text-[20px] font-black text-[#1a1a1a] leading-tight mb-3 group-hover:text-[#EE4D2D] transition-colors line-clamp-2">
               {article.title}

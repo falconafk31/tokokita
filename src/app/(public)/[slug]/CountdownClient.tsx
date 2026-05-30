@@ -7,6 +7,7 @@ const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 
 export default function CountdownClient({ product, delay = 3, pixelId }: { product: any, delay: number, pixelId?: string }) {
   const [countdown, setCountdown] = useState(delay)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     // Jalankan timer
@@ -19,6 +20,7 @@ export default function CountdownClient({ product, delay = 3, pixelId }: { produ
         }
         return prev - 1
       })
+      setProgress(p => Math.min(p + (100 / delay), 100))
     }, 1000)
 
     return () => clearInterval(timer)
@@ -59,6 +61,13 @@ export default function CountdownClient({ product, delay = 3, pixelId }: { produ
         
         <div className="text-center text-[#999] text-[13px] font-bold">
           Otomatis dialihkan dalam <span className="text-[#EE4D2D] text-[16px] font-black animate-pulse">{countdown}</span> detik
+        </div>
+
+        <div className="mt-3 h-1.5 rounded-full bg-[#ffe5dd] overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-gradient-to-r from-[#EE4D2D] to-[#FF7337] transition-all duration-1000 ease-linear"
+            style={{ width: `${progress}%` }} 
+          />
         </div>
 
         <div className="flex justify-center gap-3 md:gap-4 pt-4 border-t border-[#f0f0f0]">
