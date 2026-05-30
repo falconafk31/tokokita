@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Seed scripts & Data files
+seed*.mjs
+*.xlsx
+*.csv
+/public/uploads/
