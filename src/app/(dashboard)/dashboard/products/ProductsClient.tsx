@@ -44,7 +44,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
     if (!form.name || !form.price || !form.shopee_affiliate_url) return
     setIsSaving(true)
     
-    const payload = {
+    const payload: any = {
       ...form,
       price: parseInt(form.price as string),
       original_price: parseInt((form.original_price || form.price) as string),
