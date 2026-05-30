@@ -17,8 +17,8 @@ export default async function AnalyticsPage() {
   // --- Kalkulasi Metrik ---
   const totalClicks = clickList.length
   
-  // Klik Hari Ini
-  const today = new Date().toISOString().split('T')[0]
+  // Klik Hari Ini (Berdasarkan Waktu WIB Jakarta)
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date()); // Format: YYYY-MM-DD
   const todayClicks = clickList.filter((c: any) => c.created_at && c.created_at.startsWith(today)).length
 
   // Pengunjung Unik
@@ -54,7 +54,7 @@ export default async function AnalyticsPage() {
   const formatTime = (iso: string) => {
     try {
       const d = new Date(iso)
-      return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
+      return d.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB'
     } catch {
       return '??:??'
     }
