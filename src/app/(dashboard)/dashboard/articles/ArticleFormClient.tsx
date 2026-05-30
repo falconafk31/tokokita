@@ -23,6 +23,7 @@ export default function ArticleFormClient({ initialData, products }: { initialDa
     product_id: initialData?.product_id || '',
     redirect_delay: initialData?.redirect_delay || 3,
     published: initialData?.published || false,
+    image_url: initialData?.image_url || '',
   })
 
   const handleSave = async (published: boolean) => {
