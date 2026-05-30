@@ -51,12 +51,17 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
     const isTablet = /tablet|ipad/i.test(ua)
     const deviceType = isTablet ? 'Tablet' : isMobile ? 'Smartphone' : 'Desktop'
 
+    // Deteksi bot dari social media / search engine
+    const isBot = /bot|facebookexternalhit|whatsapp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex/i.test(ua)
+    
+    const finalDeviceType = isBot ? 'Bot' : deviceType
+
     // Fire and forget insert (don't block render)
     supabase.from('product_clicks').insert({
       product_id: product.id,
       ip_address: ip,
       user_agent: ua,
-      device_type: deviceType
+      device_type: finalDeviceType
     }).then(({ error }) => {
       if (error) console.error('Failed to track click:', error)
     })

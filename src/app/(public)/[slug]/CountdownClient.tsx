@@ -58,7 +58,15 @@ export default function CountdownClient({ product, delay = 3, pixelId }: { produ
         </button>
         
         <div className="text-center text-[#999] text-[13px] font-bold">
-          Otomatis dialihkan dalam <span className="text-[#EE4D2D] text-[15px]">{countdown}</span> detik
+          Otomatis dialihkan dalam <span className="text-[#EE4D2D] text-[16px] font-black animate-pulse">{countdown}</span> detik
+        </div>
+
+        <div className="flex justify-center gap-3 md:gap-4 pt-4 border-t border-[#f0f0f0]">
+          {["🚚 Gratis Ongkir", "✅ Garansi Ori", "💳 Bisa COD"].map(badge => (
+            <span key={badge} className="text-[#666] text-[11px] md:text-[12px] font-extrabold tracking-tight">
+              {badge}
+            </span>
+          ))}
         </div>
       </div>
     </div>

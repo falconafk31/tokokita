@@ -84,9 +84,11 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
                 ${p.badge === 'TERLARIS' ? 'bg-[#EE4D2D]' : p.badge === 'HOT 🔥' ? 'bg-[#FF6B35]' : p.badge === 'BARU' ? 'bg-[#00B14F]' : 'bg-[#333]'}`}>
                 {p.badge || 'BARU'}
               </div>
-              <div className="absolute top-2.5 right-2.5 bg-white text-[#EE4D2D] text-[11px] font-extrabold px-1.5 py-0.5 rounded-md border border-[#FFD6C8]">
-                -{disc(p.original_price || p.price, p.price)}%
-              </div>
+              {disc(p.original_price || p.price, p.price) > 0 && (
+                <div className="absolute top-2.5 right-2.5 bg-white text-[#EE4D2D] text-[11px] font-extrabold px-1.5 py-0.5 rounded-md border border-[#FFD6C8]">
+                  -{disc(p.original_price || p.price, p.price)}%
+                </div>
+              )}
               <div className="absolute inset-0 bg-[#EE4D2D]/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="bg-[#EE4D2D] text-white font-extrabold text-[13px] px-5 py-2.5 rounded-xl shadow-[0_4px_20px_rgba(238,77,45,0.4)]">
                   🛒 Beli di Shopee

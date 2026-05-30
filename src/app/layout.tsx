@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from "next";
 import { Nunito, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -35,7 +36,9 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         {pixelId && (
           <>
-            <script
+            <Script
+              id="fb-pixel"
+              strategy="afterInteractive"
               dangerouslySetInnerHTML={{
                 __html: `
                   !function(f,b,e,v,n,t,s)

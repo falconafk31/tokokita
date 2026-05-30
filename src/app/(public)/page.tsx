@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import HeroBanner from '@/components/store/HeroBanner'
 import PublicStoreClient from '@/components/store/PublicStoreClient'
 
 export const revalidate = 60 // revalidate every minute for public store
@@ -15,7 +14,6 @@ export default async function PublicStore() {
 
   return (
     <>
-      <HeroBanner />
       <PublicStoreClient products={products || []} />
     </>
   )

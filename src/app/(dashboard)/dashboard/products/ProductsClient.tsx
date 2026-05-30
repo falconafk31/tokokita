@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { upsertProduct, deleteProduct } from './actions'
 import BulkUploadProducts from '@/components/dashboard/BulkUploadProducts'
+import ConfirmModal from '@/components/shared/ConfirmModal'
 
 const CATEGORIES = ["Fashion", "Mainan Anak", "Kasur & Sprei", "Seragam", "Aksesoris"]
 const BADGES = ["BARU", "TERLARIS", "HOT 🔥", "SALE", "DISKON 38%", "TOP RATED"]
@@ -16,6 +17,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
   const [isSaving, setIsSaving] = useState(false)
   const [sortBy, setSortBy] = useState('newest') // newest, oldest
   const [currentPage, setCurrentPage] = useState(1)
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
   const ITEMS_PER_PAGE = 10
 
   const sortedProducts = [...initialProducts].sort((a, b) => {
@@ -63,9 +65,10 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
     setShowForm(false)
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Yakin ingin menghapus produk ini?")) {
-      await deleteProduct(id)
+  const confirmDelete = async () => {
+    if (itemToDelete) {
+      await deleteProduct(itemToDelete)
+      setItemToDelete(null)
     }
   }
 
@@ -138,7 +141,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
                   <td className="p-4">
                     <div className="flex gap-2">
                       <button onClick={() => openEdit(p)} className="p-1.5 rounded-md border border-[#e5e5e5] bg-white text-[#555] text-[12px] hover:bg-gray-50">✏️</button>
-                      <button onClick={() => handleDelete(p.id)} className="p-1.5 rounded-md border border-[#FFD6C8] bg-[#fff8f6] text-[#EE4D2D] text-[12px] hover:bg-red-50">🗑️</button>
+                      <button onClick={() => setItemToDelete(p.id)} className="p-1.5 rounded-md border border-[#FFD6C8] bg-[#fff8f6] text-[#EE4D2D] text-[12px] hover:bg-red-50">🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -247,6 +250,14 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={!!itemToDelete}
+        title="Hapus Produk?"
+        message="Produk yang dihapus tidak dapat dikembalikan lagi. Klik pada produk yang telah di-share akan error."
+        onConfirm={confirmDelete}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   )
 }

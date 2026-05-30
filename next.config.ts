@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'placehold.co',
       },
+      {
+        protocol: 'https',
+        hostname: 's.shopee.co.id',
+      },
+      {
+        protocol: 'https',
+        hostname: 'shope.ee',
+      },
     ],
   },
 };

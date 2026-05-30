@@ -45,17 +45,9 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Search Bar & Action */}
-        <div className="flex flex-1 md:flex-none items-center justify-end gap-3 min-w-[200px] max-w-[300px]">
-          <div className="relative w-full hidden sm:block">
-            <input
-              placeholder="Cari..."
-              className="w-full py-2.5 pr-4 pl-10 rounded-full border border-[#e5e5e5] text-[13px] outline-none bg-[#fafafa] box-border focus:border-[#FF7337] focus:bg-white focus:ring-4 focus:ring-[#FF7337]/10 transition-all"
-            />
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40 w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-            </svg>
-          </div>
+        {/* Spacer for right side */}
+        <div className="flex flex-1 md:flex-none items-center justify-end gap-3 min-w-[50px]">
+          {/* We can add future actions here like dark mode toggle or cart */}
         </div>
 
       </div>

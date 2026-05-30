@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Topbar from '@/components/dashboard/Topbar'
+import RecentClicksClient from '@/components/dashboard/RecentClicksClient'
 
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 
@@ -14,20 +15,21 @@ export default async function AnalyticsPage() {
   const { data: clicks } = await supabase.from('product_clicks').select('*')
   const clickList = clicks || []
 
-  // --- Kalkulasi Metrik ---
-  const totalClicks = clickList.length
+  // --- Kalkulasi Metrik (Hanya Manusia) ---
+  const humanClicks = clickList.filter((c: any) => c.device_type !== 'Bot')
+  const totalClicks = humanClicks.length
   
   // Klik Hari Ini (Berdasarkan Waktu WIB Jakarta)
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date()); // Format: YYYY-MM-DD
-  const todayClicks = clickList.filter((c: any) => c.created_at && c.created_at.startsWith(today)).length
+  const todayClicks = humanClicks.filter((c: any) => c.created_at && c.created_at.startsWith(today)).length
 
   // Pengunjung Unik
-  const uniqueIPs = new Set(clickList.map((c: any) => c.ip_address).filter(Boolean)).size
+  const uniqueIPs = new Set(humanClicks.map((c: any) => c.ip_address).filter(Boolean)).size
 
   // Device Dominance
-  const mobileClicks = clickList.filter((c: any) => c.device_type === 'Smartphone').length
-  const desktopClicks = clickList.filter((c: any) => c.device_type === 'Desktop').length
-  const tabletClicks = clickList.filter((c: any) => c.device_type === 'Tablet').length
+  const mobileClicks = humanClicks.filter((c: any) => c.device_type === 'Smartphone').length
+  const desktopClicks = humanClicks.filter((c: any) => c.device_type === 'Desktop').length
+  const tabletClicks = humanClicks.filter((c: any) => c.device_type === 'Tablet').length
 
   const stats = [
     { label: "Total Redirect", value: totalClicks.toLocaleString('id-ID'), icon: "🚀", color: "border-l-[#EE4D2D]" },
@@ -36,8 +38,8 @@ export default async function AnalyticsPage() {
     { label: "Akses Mobile", value: totalClicks > 0 ? Math.round((mobileClicks / totalClicks) * 100) + "%" : "0%", icon: "📱", color: "border-l-[#FFB347]" },
   ]
 
-  // --- Kalkulasi Produk Terpopuler ---
-  const clickCountByProduct = clickList.reduce((acc: any, c: any) => {
+  // --- Kalkulasi Produk Terpopuler (Hanya Manusia) ---
+  const clickCountByProduct = humanClicks.reduce((acc: any, c: any) => {
     if (c.product_id) acc[c.product_id] = (acc[c.product_id] || 0) + 1
     return acc
   }, {})
@@ -62,7 +64,6 @@ export default async function AnalyticsPage() {
 
   const recentClicks = [...clickList]
     .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 10)
     .map(c => {
       const prod = prodList.find(p => p.id === c.product_id)
       return { ...c, product_name: prod?.name || 'Produk Dihapus' }
@@ -154,29 +155,8 @@ export default async function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Recent Clicks */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex-1">
-              <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-5 border-b border-[#f0f0f0] pb-3">⏱️ Riwayat Klik Terbaru</h2>
-              <div className="flex flex-col gap-4">
-                {recentClicks.map((c: any) => (
-                  <div key={c.id} className="flex flex-col gap-1 border-l-2 border-[#EE4D2D] pl-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[12px] font-black text-[#1a1a1a] truncate pr-2">{c.product_name}</span>
-                      <span className="text-[10px] font-bold text-[#EE4D2D] whitespace-nowrap bg-[#fff1f0] px-2 py-0.5 rounded-md">
-                        {formatTime(c.created_at)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[#999] text-[11px] font-bold">
-                      <span>IP: {c.ip_address}</span>
-                      <span>{c.device_type}</span>
-                    </div>
-                  </div>
-                ))}
-                {recentClicks.length === 0 && (
-                  <div className="text-center text-[#999] text-[13px] py-2">Belum ada aktivitas.</div>
-                )}
-              </div>
-            </div>
+            {/* Recent Clicks with Load More */}
+            <RecentClicksClient clicks={recentClicks} />
           </div>
         </div>
 

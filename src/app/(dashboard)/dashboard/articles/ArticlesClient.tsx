@@ -3,17 +3,20 @@
 import { useState } from 'react'
 import { deleteArticle } from './actions'
 import Link from 'next/link'
+import ConfirmModal from '@/components/shared/ConfirmModal'
 
 export default function ArticlesClient({ initialArticles }: { initialArticles: any[] }) {
   const [currentPage, setCurrentPage] = useState(1)
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
   const ITEMS_PER_PAGE = 10
 
   const totalPages = Math.max(1, Math.ceil(initialArticles.length / ITEMS_PER_PAGE))
   const currentArticles = initialArticles.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Yakin ingin menghapus artikel ini?")) {
-      await deleteArticle(id)
+  const confirmDelete = async () => {
+    if (itemToDelete) {
+      await deleteArticle(itemToDelete)
+      setItemToDelete(null)
     }
   }
 
@@ -53,7 +56,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: a
                 <td className="p-4">
                   <div className="flex gap-2">
                     <Link href={`/dashboard/articles/${a.id}/edit`} className="p-1.5 rounded-md border border-[#e5e5e5] bg-white text-[#555] text-[12px] hover:bg-gray-50 flex items-center justify-center no-underline">✏️</Link>
-                    <button onClick={() => handleDelete(a.id)} className="p-1.5 rounded-md border border-[#FFD6C8] bg-[#fff8f6] text-[#EE4D2D] text-[12px] hover:bg-red-50">🗑️</button>
+                    <button onClick={() => setItemToDelete(a.id)} className="p-1.5 rounded-md border border-[#FFD6C8] bg-[#fff8f6] text-[#EE4D2D] text-[12px] hover:bg-red-50">🗑️</button>
                     <a href={`/blog/${a.slug}`} target="_blank" rel="noreferrer" className="p-1.5 rounded-md border border-[#e5e5e5] bg-white text-[#555] text-[12px] hover:bg-gray-50 flex items-center justify-center no-underline">👁️</a>
                   </div>
                 </td>
@@ -96,6 +99,14 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: a
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={!!itemToDelete}
+        title="Hapus Artikel?"
+        message="Artikel yang dihapus tidak dapat dikembalikan. URL artikel ini akan menampilkan halaman Not Found."
+        onConfirm={confirmDelete}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   )
 }
