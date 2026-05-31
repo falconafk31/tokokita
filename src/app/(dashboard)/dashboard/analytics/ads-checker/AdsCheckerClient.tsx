@@ -15,6 +15,10 @@ export default function AdsCheckerClient() {
     endDate: string;
     amountSpent: number;
     costPerClick: number;
+    demographics?: {
+      gender: { name: string, pct: number }[];
+      age: { name: string, pct: number }[];
+    }
   } | null>(null)
 
   const [dbStats, setDbStats] = useState<{
@@ -47,26 +51,14 @@ export default function AdsCheckerClient() {
           return
         }
 
-        // Biasanya Meta Ads CSV ada row kosong atau summary di bawah, kita ambil row pertama atau akumulasi
-        let totalAdsClicks = 0
-        let totalSpent = 0
-        let reportingStarts = ''
-        let reportingEnds = ''
-
-        data.forEach((row: any) => {
-          if (row['Link clicks']) {
-            totalAdsClicks += Number(row['Link clicks']) || 0
-          }
-          if (row['Amount spent (IDR)']) {
-            totalSpent += Number(row['Amount spent (IDR)']) || 0
-          }
-          if (row['Reporting starts'] && !reportingStarts) {
-            reportingStarts = row['Reporting starts']
-          }
-          if (row['Reporting ends']) {
-            reportingEnds = row['Reporting ends']
-          }
-        })
+        // 1. Cari baris ringkasan untuk total klik (biasanya baris pertama atau Campaign name kosong)
+        // Meta Ads biasanya menaruh ringkasan di data[0] pada file XLSX.
+        const summaryRow = data.find((row: any) => !row['Campaign name'] || row['Campaign name'] === 'All' || row['Campaign name'] === '') || data[0]
+        
+        const totalAdsClicks = Number(summaryRow['Link clicks']) || 0
+        const totalSpent = Number(summaryRow['Amount spent (IDR)']) || 0
+        const reportingStarts = summaryRow['Reporting starts'] || ''
+        const reportingEnds = summaryRow['Reporting ends'] || ''
 
         if (totalAdsClicks === 0) {
           setError("Tidak menemukan kolom 'Link clicks' atau nilainya 0 pada file ini.")
@@ -74,12 +66,52 @@ export default function AdsCheckerClient() {
           return
         }
 
+        // 2. Ekstrak Demografi (Gender & Age)
+        const genderMap: Record<string, number> = {}
+        const ageMap: Record<string, number> = {}
+        let hasDemographics = false
+
+        data.forEach((row: any) => {
+          const clicks = Number(row['Link clicks']) || 0
+          if (clicks > 0) {
+            const age = row['Age']
+            const gender = row['Gender']
+            const day = row['Day']
+
+            // Agar tidak double count dengan breakdown Day, kita abaikan baris yang memiliki hari spesifik
+            // JIKA ada baris harian. Namun jika report HANYA Harian, kita harus hitung. 
+            // Cara paling aman untuk rasio demografi: jumlahkan saja semuanya. Rasio persen akan tetap sama walau double count.
+            if (age && age !== 'All' && age !== '') {
+              ageMap[age] = (ageMap[age] || 0) + clicks
+              hasDemographics = true
+            }
+            if (gender && gender !== 'All' && gender !== '' && gender !== 'unknown' && gender !== 'uncategorized') {
+              genderMap[gender] = (genderMap[gender] || 0) + clicks
+              hasDemographics = true
+            }
+          }
+        })
+
+        // Normalisasi menjadi persentase (Top 5)
+        const normalize = (map: Record<string, number>) => {
+          const total = Object.values(map).reduce((a, b) => a + b, 0)
+          if (total === 0) return []
+          return Object.entries(map)
+            .map(([name, count]) => ({ name, pct: Math.round((count / total) * 100) }))
+            .sort((a, b) => b.pct - a.pct)
+            .slice(0, 5)
+        }
+
         const report = {
           adsClicks: totalAdsClicks,
           amountSpent: totalSpent,
           costPerClick: totalSpent / totalAdsClicks,
           startDate: reportingStarts,
-          endDate: reportingEnds
+          endDate: reportingEnds,
+          demographics: hasDemographics ? {
+            gender: normalize(genderMap),
+            age: normalize(ageMap)
+          } : undefined
         }
 
         setReportData(report)
@@ -178,6 +210,55 @@ export default function AdsCheckerClient() {
               <div className="text-[11px] font-bold text-[#FF9800]">Terindikasi Fraud/Spam</div>
             </div>
           </div>
+
+          {/* Insight Demografi */}
+          {reportData.demographics && (reportData.demographics.gender.length > 0 || reportData.demographics.age.length > 0) && (
+            <div className="mb-8 p-6 rounded-2xl bg-white border border-[#e5e5e5] shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+              <h3 className="text-[16px] font-black text-[#1a1a1a] mb-5 border-b border-[#f0f0f0] pb-3">👥 Insight Audiens (Dari Iklan)</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Gender */}
+                {reportData.demographics.gender.length > 0 && (
+                  <div>
+                    <h4 className="text-[13px] font-bold text-[#666] mb-4">Distribusi Gender</h4>
+                    <div className="space-y-3">
+                      {reportData.demographics.gender.map(g => (
+                        <div key={g.name}>
+                          <div className="flex justify-between text-[13px] font-bold mb-1.5">
+                            <span className="text-[#1a1a1a] capitalize">{g.name === 'male' ? 'Laki-laki' : g.name === 'female' ? 'Perempuan' : g.name}</span>
+                            <span className="text-[#8B5CF6]">{g.pct}%</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-[#f0f0f0] overflow-hidden">
+                            <div className="h-full rounded-full bg-[#8B5CF6]" style={{ width: `${g.pct}%` }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Age */}
+                {reportData.demographics.age.length > 0 && (
+                  <div>
+                    <h4 className="text-[13px] font-bold text-[#666] mb-4">Kelompok Umur Teratas</h4>
+                    <div className="space-y-3">
+                      {reportData.demographics.age.map(a => (
+                        <div key={a.name}>
+                          <div className="flex justify-between text-[13px] font-bold mb-1.5">
+                            <span className="text-[#1a1a1a]">{a.name} Tahun</span>
+                            <span className="text-[#FF9800]">{a.pct}%</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-[#f0f0f0] overflow-hidden">
+                            <div className="h-full rounded-full bg-[#FF9800]" style={{ width: `${a.pct}%` }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Analisa Kesimpulan */}
           <div className="p-6 rounded-2xl bg-gradient-to-br from-[#fafafa] to-white border border-[#e5e5e5]">

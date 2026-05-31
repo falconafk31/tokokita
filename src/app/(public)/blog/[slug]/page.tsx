@@ -7,6 +7,10 @@ import ShareButtons from '@/components/shared/ShareButtons'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import BlogInteractivity from '@/components/blog/BlogInteractivity'
+
+export const revalidate = 3600 // Cache halaman blog selama 1 jam (ISR)
+
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -18,6 +22,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: article.meta_title || article.title,
     description: article.meta_desc,
+    openGraph: {
+      title: article.meta_title || article.title,
+      description: article.meta_desc,
+      images: article.image_url ? [article.image_url] : [],
+      type: 'article',
+    }
   }
 }
 
@@ -110,9 +120,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </div>
             
             {/* Article Body */}
-            <div className="bg-white md:bg-transparent rounded-[24px] md:rounded-none p-6 md:p-0 shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:shadow-none mb-16">
+            <div className="bg-white md:bg-transparent rounded-[24px] md:rounded-none p-6 md:p-0 shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:shadow-none mb-16 relative">
+              <BlogInteractivity product={article.product} />
               <div 
-                className="tiptap-editor text-[#333] text-[17px] md:text-[18px] leading-[1.8] font-nunito"
+                className="tiptap-editor text-[#333] text-[17px] md:text-[18px] leading-[1.8] font-nunito clear-none"
                 dangerouslySetInnerHTML={{ __html: article.content || '' }} 
               />
               

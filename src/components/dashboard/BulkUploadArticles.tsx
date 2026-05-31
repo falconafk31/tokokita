@@ -34,18 +34,35 @@ export default function BulkUploadArticles() {
         const formattedData = data.map((row: any) => {
           const rawContent = row['Konten'] || ''
           
-          // Convert plain text newlines to HTML paragraphs
+          // Convert plain text newlines to HTML paragraphs, and support basic Markdown Headings
           const htmlContent = rawContent
             .split('\n')
             .filter((p: string) => p.trim() !== '')
-            .map((p: string) => `<p>${p}</p>`)
+            .map((p: string) => {
+              const text = p.trim()
+              if (text.startsWith('### ')) {
+                return `<h3>${text.replace('### ', '')}</h3>`
+              }
+              if (text.startsWith('## ')) {
+                return `<h2>${text.replace('## ', '')}</h2>`
+              }
+              if (text.startsWith('<')) {
+                return text // Biarkan jika sudah mengandung tag HTML
+              }
+              return `<p>${text}</p>`
+            })
             .join('')
 
           return {
             title: row['Judul'] || '',
             content: htmlContent || '<p></p>',
             image_url: row['URL Gambar Cover'] || '',
-            status: row['Status'] || 'published'
+            category: row['Kategori'] || 'Umum',
+            slug: row['URL Slug'] || null,
+            product_id: row['Produk Terkait (ID)'] || null,
+            meta_title: row['Meta Title'] || '',
+            meta_desc: row['Meta Description'] || '',
+            published: row['Status'] ? row['Status'].toString().toLowerCase() === 'published' : true
           }
         })
 
@@ -70,8 +87,13 @@ export default function BulkUploadArticles() {
     const ws = XLSX.utils.json_to_sheet([
       {
         'Judul': 'Khasiat Daun Sirih',
-        'Konten': 'Daun sirih memiliki banyak manfaat.\n\nSalah satunya adalah sebagai antibakteri.',
-        'URL Gambar Cover': 'https://...',
+        'Konten': '## Manfaat Utama\n\nDaun sirih memiliki banyak manfaat.\n\n### Sebagai Antibakteri\n\nSalah satunya adalah membunuh kuman.',
+        'URL Gambar Cover': 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09',
+        'Kategori': 'Kesehatan',
+        'URL Slug': 'khasiat-daun-sirih',
+        'Produk Terkait (ID)': '',
+        'Meta Title': '5 Khasiat Daun Sirih yang Belum Anda Ketahui',
+        'Meta Description': 'Pelajari manfaat rahasia daun sirih untuk kesehatan tubuh dan antibakteri alami.',
         'Status': 'published'
       }
     ])

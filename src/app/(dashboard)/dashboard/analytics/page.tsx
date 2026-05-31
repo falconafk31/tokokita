@@ -8,17 +8,19 @@ import Link from 'next/link'
 
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 
+export const revalidate = 30 // Caching untuk menghemat query database
+
 export default async function AnalyticsPage() {
   const supabase = await createClient()
   
-  // 1. Ambil data produk
-  const { data: products } = await supabase.from('products').select('*')
+  // 1. Ambil data produk (Hanya ID, Nama, dan Gambar untuk optimasi RAM)
+  const { data: products } = await supabase.from('products').select('id, name, image_url')
   const prodList = products || []
 
-  // 2. Ambil data klik (real-time analytics)
+  // 2. Ambil data klik (Real-time analytics dengan optimasi RAM)
   const { data: clicks } = await supabase
     .from('product_clicks')
-    .select('*')
+    .select('id, product_id, device_type, created_at, ip_address')
     .order('created_at', { ascending: false })
     .limit(10000)
     

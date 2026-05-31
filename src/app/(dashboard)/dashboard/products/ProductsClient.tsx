@@ -128,8 +128,14 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                        <Image src={p.image_url} alt={p.name} fill sizes="40px" className="object-cover" />
+                      <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#fafafa]">
+                        <img 
+                          src={p.image_url} 
+                          alt={p.name} 
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.src = `https://placehold.co/100x100/FFE5E5/EE4D2D?text=No+Img` }}
+                          className="w-full h-full object-cover" 
+                        />
                       </div>
                       <div className="text-[13px] font-bold text-[#1a1a1a] max-w-[160px] line-clamp-2">
                         {p.name}
