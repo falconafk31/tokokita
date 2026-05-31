@@ -33,15 +33,33 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
         <div className="text-[#a0a0a0] text-[11px] font-extrabold px-3 mb-2 tracking-wider mt-2">MAIN MENU</div>
         {navItems.map(item => {
           const isActive = pathname.startsWith(item.id)
+          const isAnalytics = item.id === '/dashboard/analytics'
+          
           return (
-            <Link key={item.id} href={item.id} onClick={onClose} className={`
-              flex items-center gap-3.5 w-full px-4 py-3 rounded-xl border-none cursor-pointer text-[14px] font-bold text-left transition-all group
-              ${isActive ? 'bg-gradient-to-r from-[#fff1f0] to-white text-[#EE4D2D] shadow-[inset_2px_0_0_#EE4D2D]' : 'bg-transparent text-[#666] hover:bg-gray-50 hover:text-[#1a1a1a]'}
-            `}>
-              <span className={`text-[18px] transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100'}`}>{item.icon}</span>
-              {item.label}
-              {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#EE4D2D] shadow-[0_0_8px_rgba(238,77,45,0.4)]" />}
-            </Link>
+            <div key={item.id} className="flex flex-col gap-1">
+              <Link href={item.id} onClick={onClose} className={`
+                flex items-center gap-3.5 w-full px-4 py-3 rounded-xl border-none cursor-pointer text-[14px] font-bold text-left transition-all group
+                ${isActive ? 'bg-gradient-to-r from-[#fff1f0] to-white text-[#EE4D2D] shadow-[inset_2px_0_0_#EE4D2D]' : 'bg-transparent text-[#666] hover:bg-gray-50 hover:text-[#1a1a1a]'}
+              `}>
+                <span className={`text-[18px] transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100'}`}>{item.icon}</span>
+                {item.label}
+                {isActive && !isAnalytics && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#EE4D2D] shadow-[0_0_8px_rgba(238,77,45,0.4)]" />}
+              </Link>
+              
+              {isAnalytics && isActive && (
+                <div className="ml-10 pl-3 py-2 border-l border-[#f0f0f0] flex flex-col gap-2">
+                  <Link href="/dashboard/analytics" className={`text-[12px] font-bold transition-colors ${pathname === '/dashboard/analytics' ? 'text-[#EE4D2D]' : 'text-[#999] hover:text-[#1a1a1a]'}`}>
+                    Ringkasan
+                  </Link>
+                  <Link href="/dashboard/analytics/history" className={`text-[12px] font-bold transition-colors ${pathname === '/dashboard/analytics/history' ? 'text-[#EE4D2D]' : 'text-[#999] hover:text-[#1a1a1a]'}`}>
+                    Riwayat Lengkap
+                  </Link>
+                  <Link href="/dashboard/analytics/ads-checker" className={`text-[12px] font-bold transition-colors ${pathname === '/dashboard/analytics/ads-checker' ? 'text-[#EE4D2D]' : 'text-[#999] hover:text-[#1a1a1a]'}`}>
+                    Validasi Iklan
+                  </Link>
+                </div>
+              )}
+            </div>
           )
         })}
       </div>

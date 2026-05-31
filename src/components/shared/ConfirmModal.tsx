@@ -10,16 +10,28 @@ interface ConfirmModalProps {
   cancelText?: string
 }
 
-export default function ConfirmModal({
-  isOpen,
-  title,
-  message,
-  onConfirm,
-  onCancel,
-  confirmText = "Ya, Hapus",
-  cancelText = "Batal"
-}: ConfirmModalProps) {
-  if (!isOpen) return null
+  import { useEffect } from 'react'
+
+  export default function ConfirmModal({
+    isOpen,
+    title,
+    message,
+    onConfirm,
+    onCancel,
+    confirmText = "Ya, Hapus",
+    cancelText = "Batal"
+  }: ConfirmModalProps) {
+    useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && isOpen) {
+          onCancel()
+        }
+      }
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }, [isOpen, onCancel])
+    
+    if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">

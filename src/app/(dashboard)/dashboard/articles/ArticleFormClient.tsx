@@ -98,7 +98,14 @@ export default function ArticleFormClient({ initialData, products }: { initialDa
           <div className="mb-4">
             <label className="text-[12px] font-bold text-[#666] block mb-1.5">URL Gambar Cover</label>
             <input value={form.image_url} onChange={e => setForm(p => ({ ...p, image_url: e.target.value }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none" placeholder="https://... (Opsional)" />
-            {form.image_url && <img src={form.image_url} alt="Cover Preview" className="mt-2 w-full h-[120px] object-cover rounded-xl border border-[#e5e5e5]" />}
+            {form.image_url && (
+              <img 
+                src={form.image_url} 
+                alt="Cover Preview" 
+                onError={(e) => { e.currentTarget.src = `https://placehold.co/600x400/FFE5E5/EE4D2D?text=Preview+Gagal` }}
+                className="mt-2 w-full h-[120px] object-cover rounded-xl border border-[#e5e5e5]" 
+              />
+            )}
           </div>
 
           <div className="mb-4">

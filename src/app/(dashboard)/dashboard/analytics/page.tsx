@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Topbar from '@/components/dashboard/Topbar'
 import RecentClicksClient from '@/components/dashboard/RecentClicksClient'
 import AnalyticsChart from '@/components/dashboard/AnalyticsChart'
+import AnalyticsChartErrorBoundary from '@/components/dashboard/AnalyticsChartErrorBoundary'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -127,7 +128,9 @@ export default async function AnalyticsPage() {
             {/* Chart Section */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
               <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-2">📈 Tren Pengunjung (7 Hari Terakhir)</h2>
-              <AnalyticsChart data={chartData} />
+              <AnalyticsChartErrorBoundary>
+                <AnalyticsChart data={chartData} />
+              </AnalyticsChartErrorBoundary>
             </div>
 
             {/* Top Products Section */}

@@ -54,7 +54,7 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
         {dynamicCategories.map(cat => {
           const isActive = activeCategory === cat
           return (
-            <button key={cat} onClick={() => setActiveCategory(cat)} className={`
+            <button key={cat} aria-label={`Filter kategori ${cat}`} onClick={() => setActiveCategory(cat)} className={`
               snap-start py-2.5 px-6 rounded-full border-none text-[14px] font-bold cursor-pointer whitespace-nowrap transition-all duration-300
               ${isActive ? 'bg-[#1a1a1a] text-white shadow-[0_4px_16px_rgba(0,0,0,0.15)] scale-105' : 'bg-white text-[#666] border border-[#e5e5e5] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}
             `}>
@@ -68,7 +68,7 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
         <span className="text-[#666] text-[13px]">
           <b className="text-[#1a1a1a]">{filtered.length}</b> produk ditemukan
         </span>
-        <select value={sort} onChange={e => setSort(e.target.value)} className="py-1.5 px-3 rounded-lg border border-[#e5e5e5] text-[13px] outline-none bg-white cursor-pointer">
+        <select aria-label="Urutkan produk" value={sort} onChange={e => setSort(e.target.value)} className="py-1.5 px-3 rounded-lg border border-[#e5e5e5] text-[13px] outline-none bg-white cursor-pointer">
           <option value="terlaris">Terlaris</option>
           <option value="termurah">Harga Terendah</option>
           <option value="termahal">Harga Tertinggi</option>
