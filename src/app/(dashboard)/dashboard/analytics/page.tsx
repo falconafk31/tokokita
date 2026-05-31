@@ -16,7 +16,12 @@ export default async function AnalyticsPage() {
   const prodList = products || []
 
   // 2. Ambil data klik (real-time analytics)
-  const { data: clicks } = await supabase.from('product_clicks').select('*')
+  const { data: clicks } = await supabase
+    .from('product_clicks')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(10000)
+    
   const clickList = clicks || []
 
   // --- Kalkulasi Metrik (Hanya Manusia) ---
