@@ -15,7 +15,7 @@ export const revalidate = 3600 // Cache halaman blog selama 1 jam (ISR)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const supabase = await createClient()
-  const { data: article } = await supabase.from('articles').select('meta_title, meta_desc, title').eq('slug', slug).single()
+  const { data: article } = await supabase.from('articles').select('meta_title, meta_desc, title, image_url').eq('slug', slug).single()
   
   if (!article) return {}
   
