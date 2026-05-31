@@ -27,7 +27,8 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient()
   const { data: settings } = await supabase.from('settings').select('fb_pixel_id').eq('id', 1).single()
-  const pixelId = settings?.fb_pixel_id
+  const rawPixelId = settings?.fb_pixel_id
+  const pixelId = rawPixelId && /^\d{10,20}$/.test(rawPixelId) ? rawPixelId : null
 
   return (
     <html

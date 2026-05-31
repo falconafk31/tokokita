@@ -60,7 +60,7 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
       const { count: recentClicksFromIP } = await supabase
         .from('product_clicks')
         .select('*', { count: 'exact', head: true })
-        .eq('ip_address', ip)
+        .eq('ip_address', require('crypto').createHash('sha256').update(ip + 'TokoKitaSalt123!').digest('hex').substring(0, 16))
         .gte('created_at', oneMinuteAgo)
 
       if ((recentClicksFromIP || 0) >= 5) {
@@ -70,10 +70,12 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
     
     const finalDeviceType = isBot ? 'Bot' : deviceType
 
+    const ipHash = ip !== 'Unknown' ? require('crypto').createHash('sha256').update(ip + 'TokoKitaSalt123!').digest('hex').substring(0, 16) : 'Unknown'
+
     // Fire and forget insert (don't block render)
     supabase.from('product_clicks').insert({
       product_id: product.id,
-      ip_address: ip,
+      ip_address: ipHash,
       user_agent: ua,
       device_type: finalDeviceType
     }).then(({ error }) => {

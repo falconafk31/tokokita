@@ -2,9 +2,16 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function upsertArticle(data: any) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   if (!data.slug && data.title) {
     data.slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
@@ -23,7 +30,13 @@ export async function upsertArticle(data: any) {
 }
 
 export async function deleteArticle(id: string) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   const { error } = await supabase.from('articles').delete().eq('id', id)
   
@@ -37,7 +50,13 @@ export async function deleteArticle(id: string) {
 }
 
 export async function bulkInsertArticles(dataArray: any[]) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   const formattedData = dataArray.map(data => {
     if (!data.slug && data.title) {

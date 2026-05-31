@@ -2,9 +2,16 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function updateSettings(data: any) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   // Update or insert into settings where id = 1
   const payload = { id: 1, ...data }

@@ -1,9 +1,16 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function getAdsComparisonStats(startDateStr: string, endDateStr: string) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
 
   const parseDate = (dStr: string) => {
     // Jika formatnya mengandung garis miring (biasanya DD/MM/YYYY dari Meta Ads)

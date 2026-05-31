@@ -2,9 +2,16 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function upsertProduct(data: any) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   // generate slug if new
   if (!data.slug && data.name) {
@@ -24,7 +31,13 @@ export async function upsertProduct(data: any) {
 }
 
 export async function deleteProduct(id: string) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   const { error } = await supabase.from('products').delete().eq('id', id)
   
@@ -39,7 +52,13 @@ export async function deleteProduct(id: string) {
 }
 
 export async function bulkInsertProducts(dataArray: any[]) {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return { error: 'Unauthorized' }
+  }
   
   // Format slugs for new items
   const formattedData = dataArray.map(data => {

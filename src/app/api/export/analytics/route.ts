@@ -1,8 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function GET() {
-  const supabase = await createClient()
+  let supabase;
+  try {
+    const auth = await requireAuth();
+    supabase = auth.supabase;
+  } catch (error) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
 
   const { data: clicks } = await supabase.from('product_clicks').select('*').order('created_at', { ascending: false })
   const { data: products } = await supabase.from('products').select('id, name')

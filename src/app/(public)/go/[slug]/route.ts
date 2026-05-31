@@ -33,6 +33,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     product_id: finalProduct.id,
   })
 
+  // Validasi URL hanya ke domain Shopee
+  try {
+    const url = new URL(finalProduct.shopee_affiliate_url)
+    const allowedDomains = ['shopee.co.id', 'shp.ee', 's.shopee.co.id']
+    if (!allowedDomains.some(d => url.hostname.endsWith(d))) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  } catch (e) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   return NextResponse.redirect(finalProduct.shopee_affiliate_url, {
     status: 302,
     headers: {
