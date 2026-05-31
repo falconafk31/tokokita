@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import Topbar from '@/components/dashboard/Topbar'
 import RecentClicksClient from '@/components/dashboard/RecentClicksClient'
+import AnalyticsChart from '@/components/dashboard/AnalyticsChart'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 
@@ -50,8 +52,22 @@ export default async function AnalyticsPage() {
     .sort((a, b) => b.click_count - a.click_count)
     .slice(0, 10)
 
-  // Max click for progress bar
   const maxClick = topProducts.length > 0 ? topProducts[0].click_count : 1
+
+  // --- Kalkulasi Data Grafik (7 Hari Terakhir) ---
+  const chartData = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const dateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(d) // YYYY-MM-DD
+    
+    const clicksOnDay = humanClicks.filter((c: any) => c.created_at && c.created_at.startsWith(dateStr)).length
+    
+    chartData.push({
+      date: d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+      clicks: clicksOnDay
+    })
+  }
 
   // --- Riwayat Klik Terbaru ---
   const formatTime = (iso: string) => {
@@ -75,13 +91,21 @@ export default async function AnalyticsPage() {
       <Topbar 
         title="Real-Time Analytics" 
         action={
-          <a 
-            href="/api/export/analytics" 
-            download
-            className="flex items-center gap-2 bg-[#EE4D2D] text-white px-4 py-2 rounded-xl text-[13px] font-bold shadow-md hover:bg-[#FF7337] transition-all"
-          >
-            📥 Export CSV
-          </a>
+          <div className="flex gap-2">
+            <Link 
+              href="/dashboard/analytics/ads-checker" 
+              className="flex items-center gap-2 bg-[#1a1a1a] text-white px-4 py-2 rounded-xl text-[13px] font-bold shadow-md hover:bg-[#333] transition-all"
+            >
+              📊 Validasi Iklan
+            </Link>
+            <a 
+              href="/api/export/analytics" 
+              download
+              className="flex items-center gap-2 bg-[#EE4D2D] text-white px-4 py-2 rounded-xl text-[13px] font-bold shadow-md hover:bg-[#FF7337] transition-all"
+            >
+              📥 Export CSV
+            </a>
+          </div>
         }
       />
       <div className="p-7 font-nunito">
@@ -97,9 +121,18 @@ export default async function AnalyticsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Top Products */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-            <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-5 border-b border-[#f0f0f0] pb-3">🔥 10 Produk Paling Banyak Di-klik</h2>
+          {/* Top Products & Chart */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            
+            {/* Chart Section */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+              <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-2">📈 Tren Pengunjung (7 Hari Terakhir)</h2>
+              <AnalyticsChart data={chartData} />
+            </div>
+
+            {/* Top Products Section */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+              <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-5 border-b border-[#f0f0f0] pb-3">🔥 10 Produk Paling Banyak Di-klik</h2>
             <div className="flex flex-col gap-4">
               {topProducts.map((p: any, i: number) => (
                 <div key={p.id} className="flex items-center gap-4">
@@ -125,6 +158,7 @@ export default async function AnalyticsPage() {
               {topProducts.length === 0 && (
                 <div className="text-center text-[#999] text-[13px] py-4">Belum ada data pelacakan klik.</div>
               )}
+            </div>
             </div>
           </div>
 
@@ -158,8 +192,8 @@ export default async function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Recent Clicks with Load More */}
-            <RecentClicksClient clicks={recentClicks} />
+            {/* Recent Clicks with Link to History */}
+            <RecentClicksClient clicks={recentClicks.slice(0, 10)} totalCount={clickList.length} />
           </div>
         </div>
 

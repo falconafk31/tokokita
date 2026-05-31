@@ -22,6 +22,7 @@ export default function ArticleFormClient({ initialData, products }: { initialDa
     content: initialData?.content || '',
     meta_title: initialData?.meta_title || '',
     meta_desc: initialData?.meta_desc || '',
+    category: initialData?.category || 'Umum',
     product_id: initialData?.product_id || '',
     redirect_delay: initialData?.redirect_delay || 3,
     published: initialData?.published || false,
@@ -84,6 +85,11 @@ export default function ArticleFormClient({ initialData, products }: { initialDa
         <div className="bg-white p-5 rounded-2xl border border-[#f0f0f0] shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <div className="font-bold text-[15px] mb-4">Pengaturan Artikel</div>
           
+          <div className="mb-4">
+            <label className="text-[12px] font-bold text-[#666] block mb-1.5">Kategori</label>
+            <input value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none" placeholder="Misal: Tips Herbal, Promo" />
+          </div>
+
           <div className="mb-4">
             <label className="text-[12px] font-bold text-[#666] block mb-1.5">URL Slug</label>
             <input value={form.slug} onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none" placeholder="auto-generated" />

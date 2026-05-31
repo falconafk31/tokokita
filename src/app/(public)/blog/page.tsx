@@ -14,7 +14,7 @@ export default async function BlogIndexPage() {
 
   const { data: articles } = await supabase
     .from('articles')
-    .select('id, title, slug, content, meta_desc, image_url, created_at')
+    .select('id, title, slug, content, meta_desc, image_url, created_at, category')
     .eq('published', true)
     .order('created_at', { ascending: false })
 

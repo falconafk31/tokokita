@@ -6,7 +6,6 @@ import { upsertProduct, deleteProduct } from './actions'
 import BulkUploadProducts from '@/components/dashboard/BulkUploadProducts'
 import ConfirmModal from '@/components/shared/ConfirmModal'
 
-const CATEGORIES = ["Fashion", "Mainan Anak", "Kasur & Sprei", "Seragam", "Aksesoris"]
 const BADGES = ["BARU", "TERLARIS", "HOT 🔥", "SALE", "DISKON 38%", "TOP RATED"]
 
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
@@ -21,6 +20,8 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
   const [currentPage, setCurrentPage] = useState(1)
   const [itemToDelete, setItemToDelete] = useState<string | null>(null)
   const ITEMS_PER_PAGE = 10
+
+  const dynamicCategories = Array.from(new Set(initialProducts.map(p => p.category).filter(Boolean)))
 
   const sortedProducts = [...initialProducts].sort((a, b) => {
     const timeA = new Date(a.created_at || 0).getTime()
@@ -233,15 +234,30 @@ export default function ProductsClient({ initialProducts }: { initialProducts: a
               </div>
               <div className="col-span-1">
                 <label className="text-[12px] font-bold text-[#666] block mb-1.5">Kategori</label>
-                <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337] bg-white">
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
+                <input 
+                  list="categories-list" 
+                  value={form.category} 
+                  onChange={e => setForm(p => ({ ...p, category: e.target.value }))} 
+                  className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337] bg-white" 
+                  placeholder="Ketik atau pilih kategori..."
+                />
+                <datalist id="categories-list">
+                  {dynamicCategories.map((c: any) => <option key={c} value={c} />)}
+                </datalist>
               </div>
               <div className="col-span-1">
                 <label className="text-[12px] font-bold text-[#666] block mb-1.5">Badge Label</label>
                 <select value={form.badge} onChange={e => setForm(p => ({ ...p, badge: e.target.value }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337] bg-white">
                   {BADGES.map(b => <option key={b}>{b}</option>)}
                 </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-[12px] font-bold text-[#666] block mb-1.5">Rating (1-5)</label>
+                <input type="number" step="0.1" min="1" max="5" value={form.rating} onChange={e => setForm(p => ({ ...p, rating: parseFloat(e.target.value) || 0 }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337]" placeholder="4.5" />
+              </div>
+              <div className="col-span-1">
+                <label className="text-[12px] font-bold text-[#666] block mb-1.5">Terjual</label>
+                <input type="number" min="0" value={form.sold_count} onChange={e => setForm(p => ({ ...p, sold_count: parseInt(e.target.value) || 0 }))} className="w-full p-2.5 rounded-xl border border-[#e5e5e5] text-[13px] outline-none focus:border-[#FF7337]" placeholder="0" />
               </div>
             </div>
 

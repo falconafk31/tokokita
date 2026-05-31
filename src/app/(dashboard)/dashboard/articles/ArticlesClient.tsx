@@ -26,7 +26,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: a
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#fafafa] border-b border-[#f0f0f0]">
-              {["No.", "Judul", "Slug", "Produk Terkait", "Status", "Aksi"].map(h => (
+              {["No.", "Judul", "Kategori", "Slug", "Produk Terkait", "Status", "Aksi"].map(h => (
                 <th key={h} className="p-4 text-left text-[11px] font-extrabold text-[#999] uppercase tracking-wider whitespace-nowrap">
                   {h}
                 </th>
@@ -41,6 +41,9 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: a
                 </td>
                 <td className="p-4 text-[13px] font-bold text-[#1a1a1a]">
                   {a.title}
+                </td>
+                <td className="p-4">
+                  <span className="bg-[#f0f0f0] text-[#555] text-[11px] font-bold px-2 py-1 rounded-md">{a.category || 'Umum'}</span>
                 </td>
                 <td className="p-4 text-[#555] text-[13px] max-w-[200px] truncate">
                   /{a.slug}
@@ -64,7 +67,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: a
             ))}
             {initialArticles.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-gray-400 text-sm font-bold">
+                <td colSpan={7} className="p-8 text-center text-gray-400 text-sm font-bold">
                   Belum ada artikel. Silakan buat artikel baru.
                 </td>
               </tr>

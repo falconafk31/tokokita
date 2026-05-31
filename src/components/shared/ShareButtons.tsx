@@ -26,7 +26,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
         </svg>
       ),
       url: `https://wa.me/?text=${encodeURIComponent(title + ' ' + fullUrl)}`,
-      color: 'hover:bg-[#25D366] hover:text-white border-[#25D366]/30 text-[#25D366]'
+      color: 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white border-[#25D366]/30'
     },
     {
       name: 'Facebook',
@@ -36,7 +36,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
         </svg>
       ),
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`,
-      color: 'hover:bg-[#1877F2] hover:text-white border-[#1877F2]/30 text-[#1877F2]'
+      color: 'bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white border-[#1877F2]/30'
     },
     {
       name: 'X',
@@ -46,7 +46,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
         </svg>
       ),
       url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`,
-      color: 'hover:bg-black hover:text-white border-black/30 text-black'
+      color: 'bg-black/5 text-black hover:bg-black hover:text-white border-black/30'
     }
   ]
 
@@ -62,7 +62,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center justify-center w-[36px] h-[36px] rounded-full border transition-all duration-200 ${link.color}`}
+          className={`flex items-center justify-center w-[40px] h-[40px] md:w-[36px] md:h-[36px] rounded-full border transition-all duration-200 ${link.color}`}
           title={`Bagikan ke ${link.name}`}
         >
           {link.icon}
@@ -71,7 +71,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       
       <button
         onClick={handleCopy}
-        className={`flex items-center gap-1.5 px-4 h-[36px] rounded-full border transition-all duration-200 text-[13px] font-bold group
+        className={`flex items-center gap-1.5 px-5 md:px-4 h-[40px] md:h-[36px] rounded-full border transition-all duration-200 text-[13px] md:text-[13px] font-bold group
           ${copied 
             ? 'bg-[#1a1a1a] border-[#1a1a1a] text-white' 
             : 'bg-white border-[#e5e5e5] text-[#666] hover:bg-[#1a1a1a] hover:border-[#1a1a1a] hover:text-white'

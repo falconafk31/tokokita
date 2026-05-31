@@ -6,8 +6,13 @@ import Image from 'next/image'
 
 export default function BlogListClient({ articles }: { articles: any[] }) {
   const [displayLimit, setDisplayLimit] = useState(6)
+  const [activeCategory, setActiveCategory] = useState("Semua")
 
   if (!articles || articles.length === 0) return null
+
+  const dynamicCategories = ["Semua", ...Array.from(new Set(articles.map(a => a.category).filter(Boolean)))]
+
+  const filteredArticles = articles.filter(a => activeCategory === "Semua" || a.category === activeCategory)
 
   const getReadingTime = (content: string) => {
     const wordCount = (content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
@@ -19,8 +24,22 @@ export default function BlogListClient({ articles }: { articles: any[] }) {
       <h3 className="text-[24px] font-black text-[#1a1a1a] mb-8 font-playfair border-b border-[#e5e5e5] pb-4">
         Artikel Lainnya
       </h3>
+      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar snap-x">
+        {dynamicCategories.map((cat: any) => {
+          const isActive = activeCategory === cat
+          return (
+            <button key={cat} onClick={() => { setActiveCategory(cat); setDisplayLimit(6); }} className={`
+              snap-start py-2.5 px-6 rounded-full border-none text-[14px] font-bold cursor-pointer whitespace-nowrap transition-all duration-300
+              ${isActive ? 'bg-[#1a1a1a] text-white shadow-[0_4px_16px_rgba(0,0,0,0.15)] scale-105' : 'bg-white text-[#666] border border-[#e5e5e5] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}
+            `}>
+              {cat}
+            </button>
+          )
+        })}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {articles.slice(0, displayLimit).map((article: any) => (
+        {filteredArticles.slice(0, displayLimit).map((article: any) => (
           <Link key={article.id} href={`/blog/${article.slug}`} className="group block">
             <div className="relative aspect-[4/3] rounded-[20px] overflow-hidden bg-[#fafafa] mb-5 border border-[#f0f0f0]">
               {article.image_url ? (
@@ -44,7 +63,14 @@ export default function BlogListClient({ articles }: { articles: any[] }) {
         ))}
       </div>
 
-      {articles.length > displayLimit && (
+      {filteredArticles.length === 0 && (
+        <div className="text-center py-16 px-5 text-[#aaa] w-full col-span-full">
+          <div className="text-[48px] mb-3">🔍</div>
+          <div className="text-[16px] font-bold">Artikel tidak ditemukan</div>
+        </div>
+      )}
+
+      {filteredArticles.length > displayLimit && (
         <div className="text-center mt-12">
           <button 
             onClick={() => setDisplayLimit(p => p + 6)}

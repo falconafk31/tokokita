@@ -52,7 +52,21 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
     const deviceType = isTablet ? 'Tablet' : isMobile ? 'Smartphone' : 'Desktop'
 
     // Deteksi bot dari social media / search engine
-    const isBot = /bot|facebookexternalhit|whatsapp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex/i.test(ua)
+    let isBot = /bot|facebookexternalhit|whatsapp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex/i.test(ua)
+    
+    // Deteksi bot dari Rate Limiting (Maksimal 5 klik per IP per menit)
+    if (!isBot && ip !== 'Unknown') {
+      const oneMinuteAgo = new Date(Date.now() - 60000).toISOString()
+      const { count: recentClicksFromIP } = await supabase
+        .from('product_clicks')
+        .select('*', { count: 'exact', head: true })
+        .eq('ip_address', ip)
+        .gte('created_at', oneMinuteAgo)
+
+      if ((recentClicksFromIP || 0) >= 5) {
+        isBot = true
+      }
+    }
     
     const finalDeviceType = isBot ? 'Bot' : deviceType
 

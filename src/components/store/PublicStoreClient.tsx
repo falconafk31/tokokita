@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const CATEGORIES = ["Semua", "Fashion", "Mainan Anak", "Kasur & Sprei", "Seragam", "Aksesoris"]
 const fmt = (n: number) => "Rp " + n.toLocaleString("id-ID")
 const disc = (o: number, p: number) => Math.round(((o - p) / o) * 100)
 
@@ -13,6 +12,8 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState("terlaris")
   const [displayLimit, setDisplayLimit] = useState(12)
+
+  const dynamicCategories = ["Semua", ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))]
 
   const filtered = products
     .filter(p => activeCategory === "Semua" || p.category === activeCategory)
@@ -50,7 +51,7 @@ export default function PublicStoreClient({ products }: { products: any[] }) {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar snap-x">
-        {CATEGORIES.map(cat => {
+        {dynamicCategories.map(cat => {
           const isActive = activeCategory === cat
           return (
             <button key={cat} onClick={() => setActiveCategory(cat)} className={`

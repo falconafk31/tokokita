@@ -17,6 +17,9 @@ export default function LoginFormClient() {
     if (result?.error) {
       setError(result.error)
       setLoading(false)
+    } else if (result?.success) {
+      // Force a hard reload to ensure server reads the new auth cookie
+      window.location.href = '/dashboard'
     }
   }
 

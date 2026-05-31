@@ -22,7 +22,7 @@ export async function loginAction(formData: FormData) {
     return { error: 'Email atau password salah.' }
   }
 
-  redirect('/dashboard')
+  return { success: true }
 }
 
 export async function logoutAction() {

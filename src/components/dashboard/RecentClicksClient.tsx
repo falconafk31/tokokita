@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 
-export default function RecentClicksClient({ clicks }: { clicks: any[] }) {
-  const [page, setPage] = useState(1)
-  const ITEMS_PER_PAGE = 10
-  
-  const totalPages = Math.ceil(clicks.length / ITEMS_PER_PAGE)
-  const displayedClicks = clicks.slice(0, page * ITEMS_PER_PAGE)
+import Link from 'next/link'
+
+export default function RecentClicksClient({ clicks, totalCount }: { clicks: any[], totalCount: number }) {
+  const displayedClicks = clicks.slice(0, 10)
 
   const formatTime = (iso: string) => {
     try {
@@ -23,8 +21,8 @@ export default function RecentClicksClient({ clicks }: { clicks: any[] }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex-1 h-fit">
       <h2 className="text-[16px] font-extrabold text-[#1a1a1a] mb-5 border-b border-[#f0f0f0] pb-3 flex justify-between items-center">
-        <span>⏱️ Riwayat Klik</span>
-        <span className="text-[11px] font-bold text-[#999] bg-[#f0f0f0] px-2 py-1 rounded-md">{clicks.length} Total</span>
+        <span>⏱️ 10 Klik Terbaru</span>
+        <span className="text-[11px] font-bold text-[#999] bg-[#f0f0f0] px-2 py-1 rounded-md">{totalCount} Total</span>
       </h2>
       <div className="flex flex-col gap-4">
         {displayedClicks.map((c: any) => (
@@ -50,13 +48,13 @@ export default function RecentClicksClient({ clicks }: { clicks: any[] }) {
         )}
       </div>
       
-      {page < totalPages && (
-        <button 
-          onClick={() => setPage(p => p + 1)}
-          className="w-full mt-5 py-2.5 rounded-xl border border-[#e5e5e5] text-[13px] font-bold text-[#555] hover:bg-gray-50 transition-colors"
+      {totalCount > 10 && (
+        <Link 
+          href="/dashboard/analytics/history"
+          className="w-full mt-5 py-2.5 rounded-xl border border-[#e5e5e5] text-[13px] font-bold text-[#555] hover:bg-gray-50 transition-colors flex items-center justify-center"
         >
-          Tampilkan Lebih Banyak ({page * ITEMS_PER_PAGE} / {clicks.length})
-        </button>
+          Lihat Semua Riwayat →
+        </Link>
       )}
     </div>
   )
