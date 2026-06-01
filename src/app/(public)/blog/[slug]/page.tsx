@@ -8,7 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import BlogInteractivity from '@/components/blog/BlogInteractivity'
-import DOMPurify from 'isomorphic-dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 export const revalidate = 3600 // Cache halaman blog selama 1 jam (ISR)
 
@@ -79,9 +79,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const wordCount = (article.content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
   const readingTime = Math.max(1, Math.ceil(wordCount / 200))
 
-  const cleanHTML = DOMPurify.sanitize(article.content || '', {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'a', 'img', 'blockquote', 'code', 'pre', 'div', 'span'],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'target', 'rel'],
+  const cleanHTML = sanitizeHtml(article.content || '', {
+    allowedTags: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'a', 'img', 'blockquote', 'code', 'pre', 'div', 'span'],
+    allowedAttributes: {
+      '*': ['class', 'id'],
+      'a': ['href', 'target', 'rel'],
+      'img': ['src', 'alt']
+    },
   })
 
   return (
