@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
 import CountdownClient from './CountdownClient'
 import type { Metadata } from 'next'
+import { encrypt } from '@/lib/crypto'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -60,7 +61,7 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
       const { count: recentClicksFromIP } = await supabase
         .from('product_clicks')
         .select('*', { count: 'exact', head: true })
-        .eq('ip_address', require('crypto').createHash('sha256').update(ip + 'TokoKitaSalt123!').digest('hex').substring(0, 16))
+        .eq('ip_address', encrypt(ip))
         .gte('created_at', oneMinuteAgo)
 
       if ((recentClicksFromIP || 0) >= 5) {
@@ -70,12 +71,10 @@ export default async function ProductLandingPage({ params }: { params: Promise<{
     
     const finalDeviceType = isBot ? 'Bot' : deviceType
 
-    const ipHash = ip !== 'Unknown' ? require('crypto').createHash('sha256').update(ip + 'TokoKitaSalt123!').digest('hex').substring(0, 16) : 'Unknown'
-
     // Fire and forget insert (don't block render)
     supabase.from('product_clicks').insert({
       product_id: product.id,
-      ip_address: ipHash,
+      ip_address: encrypt(ip),
       user_agent: ua,
       device_type: finalDeviceType
     }).then(({ error }) => {

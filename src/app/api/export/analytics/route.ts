@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth-guard'
+import { decrypt } from '@/lib/crypto'
 
 export async function GET() {
   let supabase;
@@ -48,7 +49,7 @@ export async function GET() {
     return [
       escapeCsv(dateStr),
       escapeCsv(productName),
-      escapeCsv(c.ip_address || '-'),
+      escapeCsv(decrypt(c.ip_address) || '-'),
       escapeCsv(c.device_type || 'Unknown')
     ].join(',')
   })
