@@ -25,7 +25,8 @@ export async function POST(request: Request) {
 
     const fileExt = file.name.split('.').pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    const filePath = `articles/${fileName}`
+    const folder = formData.get('folder') as string || 'articles'
+    const filePath = `${folder}/${fileName}`
 
     // 4. Upload to Supabase Storage (assuming bucket 'images' exists and is public)
     const { data, error } = await supabase.storage

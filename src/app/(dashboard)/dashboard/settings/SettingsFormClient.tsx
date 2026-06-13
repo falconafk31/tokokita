@@ -25,6 +25,28 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
     router.refresh()
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'favicon_url') => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const toastId = toast('Sedang mengunggah...', 'loading')
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'settings')
+
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      
+      if (!res.ok) throw new Error(data.error || 'Gagal upload')
+      
+      setForm(p => ({ ...p, [field]: data.url }))
+      toast('Gambar berhasil diunggah', 'success')
+    } catch (err: any) {
+      toast(err.message, 'error')
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-[#f0f0f0] max-w-[600px]">
       <h2 className="text-[18px] font-black text-[#1a1a1a] mb-6">Pengaturan Toko</h2>
@@ -64,13 +86,19 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
 
         <div>
           <label className="text-[13px] font-bold text-[#666] block mb-2">URL Logo Toko</label>
-          <input 
-            type="text" 
-            value={form.logo_url}
-            onChange={e => setForm(p => ({ ...p, logo_url: e.target.value }))}
-            placeholder="https://... (Direkomendasikan: 480x480 px)"
-            className="w-full p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
-          />
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              value={form.logo_url}
+              onChange={e => setForm(p => ({ ...p, logo_url: e.target.value }))}
+              placeholder="https://... (Direkomendasikan: 480x480 px)"
+              className="flex-1 p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
+            />
+            <label className="bg-[#f7f7f7] hover:bg-[#eee] border border-[#e5e5e5] rounded-xl px-5 flex items-center justify-center cursor-pointer text-[13px] font-bold text-[#666] transition-colors whitespace-nowrap">
+              Unggah File
+              <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload(e, 'logo_url')} />
+            </label>
+          </div>
           <p className="text-[11px] text-[#999] mt-1.5 font-bold">Digunakan pada Navbar, Sidebar Dasbor, dan Halaman Login.</p>
           {form.logo_url && (
             <div className="mt-3 flex items-center gap-3">
@@ -82,13 +110,19 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
 
         <div>
           <label className="text-[13px] font-bold text-[#666] block mb-2">URL Favicon (Ikon Tab Browser)</label>
-          <input 
-            type="text" 
-            value={form.favicon_url}
-            onChange={e => setForm(p => ({ ...p, favicon_url: e.target.value }))}
-            placeholder="https://... (Opsional)"
-            className="w-full p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
-          />
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              value={form.favicon_url}
+              onChange={e => setForm(p => ({ ...p, favicon_url: e.target.value }))}
+              placeholder="https://... (Opsional)"
+              className="flex-1 p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
+            />
+            <label className="bg-[#f7f7f7] hover:bg-[#eee] border border-[#e5e5e5] rounded-xl px-5 flex items-center justify-center cursor-pointer text-[13px] font-bold text-[#666] transition-colors whitespace-nowrap">
+              Unggah File
+              <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload(e, 'favicon_url')} />
+            </label>
+          </div>
           {form.favicon_url && (
             <div className="mt-3 flex items-center gap-3">
               <span className="text-[12px] text-[#999] font-bold">Preview:</span>

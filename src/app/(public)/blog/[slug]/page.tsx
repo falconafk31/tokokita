@@ -50,10 +50,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     notFound()
   }
 
-  // Fetch related articles
+  // Fetch related articles (include category, content, meta_desc for richer cards)
   const { data: relatedArticles } = await supabase
     .from('articles')
-    .select('id, title, slug, image_url, created_at')
+    .select('id, title, slug, image_url, created_at, category, content, meta_desc')
     .eq('published', true)
     .neq('id', article.id)
     .order('created_at', { ascending: false })
@@ -154,7 +154,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {/* Mobile Products Section (OPT-6) */}
             <div className="lg:hidden mb-16">
-              <h3 className="text-[20px] font-black mb-5 font-playfair text-[#1a1a1a]">🔥 Produk Populer</h3>
+              <div className="flex items-center gap-2.5 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-[#EE4D2D]/10 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EE4D2D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>
+                </div>
+                <h3 className="text-[18px] font-black font-playfair text-[#1a1a1a]">Produk Populer</h3>
+              </div>
               <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
                 {trendingProducts?.map(p => (
                   <Link key={p.id} href={`/${p.slug || p.id}`} className="snap-start min-w-[200px] w-[200px] bg-white rounded-2xl border border-[#f0f0f0] overflow-hidden shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:border-[#EE4D2D] transition-colors">
@@ -173,8 +178,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           {/* Right Column: Sidebar (Sticky) */}
           <div className="hidden lg:block space-y-6 pt-4 sticky top-[100px]">
-            <SidebarProducts title="🔥 Sedang Trending" products={trendingProducts || []} />
-            <SidebarProducts title="✨ Produk Terbaru" products={latestProducts || []} />
+            <SidebarProducts title="Sedang Trending" variant="trending" products={trendingProducts || []} />
+            <SidebarProducts title="Produk Terbaru" variant="terbaru" products={latestProducts || []} />
           </div>
 
         </div>
@@ -182,32 +187,57 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* Related Articles Section */}
       {relatedArticles && relatedArticles.length > 0 && (
-        <div className="bg-[#f7f7f7] py-16 border-t border-[#f0f0f0]">
+        <div className="bg-gradient-to-b from-[#f7f7f7] to-white py-20 border-t border-[#f0f0f0]">
           <div className="max-w-[1100px] mx-auto px-5">
-            <h3 className="text-[28px] font-black text-[#1a1a1a] mb-10 font-playfair text-center">
-              Baca Selanjutnya
-            </h3>
+            <div className="text-center mb-12">
+              <p className="text-[#EE4D2D] text-[13px] font-bold tracking-widest uppercase mb-3">Jelajahi Lebih Lanjut</p>
+              <h3 className="text-[28px] md:text-[32px] font-black text-[#1a1a1a] font-playfair">
+                Artikel Lainnya
+              </h3>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {relatedArticles.map((rel: any) => (
-                <Link key={rel.id} href={`/blog/${rel.slug}`} className="group block bg-white rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f0f0f0] transition-all hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
-                  <div className="relative aspect-[4/3] bg-[#fafafa] overflow-hidden">
-                    {rel.image_url ? (
-                      <Image src={rel.image_url} alt={rel.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[32px]">📰</div>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <div className="text-[#999] text-[12px] font-bold mb-2">
-                      {new Date(rel.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {relatedArticles.map((rel: any) => {
+                const relWordCount = (rel.content || '').replace(/<[^>]+>/g, '').split(/\s+/).length
+                const relReadTime = Math.max(1, Math.ceil(relWordCount / 200))
+                return (
+                  <Link key={rel.id} href={`/blog/${rel.slug}`} className="group block bg-white rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f0f0f0] transition-all hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)]">
+                    <div className="relative aspect-[16/10] bg-[#fafafa] overflow-hidden">
+                      {rel.image_url ? (
+                        <Image src={rel.image_url} alt={rel.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#f0f0f0] to-[#e5e5e5] flex items-center justify-center">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" /><path d="M8 7h6" /><path d="M8 11h8" /></svg>
+                        </div>
+                      )}
+                      {rel.category && (
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-bold text-[#555] uppercase tracking-wider border border-white/50">
+                          {rel.category}
+                        </div>
+                      )}
                     </div>
-                    <h4 className="text-[18px] font-black text-[#1a1a1a] leading-tight group-hover:text-[#EE4D2D] transition-colors line-clamp-3">
-                      {rel.title}
-                    </h4>
-                  </div>
-                </Link>
-              ))}
+                    <div className="p-5">
+                      <div className="flex items-center gap-2 text-[#999] text-[11px] font-bold mb-3">
+                        <span>{new Date(rel.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="w-1 h-1 rounded-full bg-[#ddd]"></span>
+                        <span>{relReadTime} min baca</span>
+                      </div>
+                      <h4 className="text-[17px] font-black text-[#1a1a1a] leading-snug mb-3 group-hover:text-[#EE4D2D] transition-colors line-clamp-2">
+                        {rel.title}
+                      </h4>
+                      {rel.meta_desc && (
+                        <p className="text-[#888] text-[13px] leading-relaxed line-clamp-2 mb-4">
+                          {rel.meta_desc}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-1.5 text-[#EE4D2D] text-[13px] font-bold">
+                        <span>Baca Selengkapnya</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </div>
