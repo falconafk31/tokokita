@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export default function Sidebar({ onClose }: { onClose?: () => void }) {
+export default function Sidebar({ onClose, shopName = 'TokoKita', logoUrl = '' }: { onClose?: () => void, shopName?: string, logoUrl?: string }) {
   const pathname = usePathname()
   
   const navItems = [
@@ -16,11 +16,14 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
   return (
     <div className="w-[260px] bg-white flex-shrink-0 flex flex-col min-h-screen sticky top-0 font-nunito border-r border-[#f0f0f0] shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
       <div className="p-7 pb-5 flex items-center justify-between">
-        <div>
-          <div className="font-playfair text-[24px] font-black bg-gradient-to-br from-[#EE4D2D] to-[#FFB347] bg-clip-text text-transparent mb-0.5 tracking-tight">
-            TokoKita
+        <div className="flex items-center gap-3">
+          {logoUrl && <img src={logoUrl} alt={shopName} className="w-10 h-10 rounded-xl object-cover shadow-sm border border-[#f0f0f0]" />}
+          <div>
+            <div className="font-playfair text-[20px] font-black bg-gradient-to-br from-[#EE4D2D] to-[#FFB347] bg-clip-text text-transparent mb-0.5 tracking-tight">
+              {shopName}
+            </div>
+            <div className="text-[#999] text-[10px] tracking-[0.2em] font-extrabold uppercase">Workspace</div>
           </div>
-          <div className="text-[#999] text-[10px] tracking-[0.2em] font-extrabold uppercase">Workspace</div>
         </div>
         {onClose && (
           <button onClick={onClose} className="md:hidden w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 font-bold">

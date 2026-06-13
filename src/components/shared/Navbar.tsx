@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
-export default function Navbar() {
+export default function Navbar({ shopName = 'TokoKita', logoUrl = '' }: { shopName?: string, logoUrl?: string }) {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
@@ -28,11 +28,15 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-[36px] h-[36px] rounded-xl bg-gradient-to-br from-[#EE4D2D] to-[#FF7337] flex items-center justify-center shadow-lg shadow-[#EE4D2D]/30 group-hover:scale-105 transition-transform">
-            <span className="text-white text-lg">🛍️</span>
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt={shopName} className="w-[36px] h-[36px] rounded-xl object-cover shadow-lg shadow-[#EE4D2D]/20 group-hover:scale-105 transition-transform" />
+          ) : (
+            <div className="w-[36px] h-[36px] rounded-xl bg-gradient-to-br from-[#EE4D2D] to-[#FF7337] flex items-center justify-center shadow-lg shadow-[#EE4D2D]/30 group-hover:scale-105 transition-transform">
+              <span className="text-white text-lg">🛍️</span>
+            </div>
+          )}
           <span className="font-playfair text-[22px] font-black text-[#1a1a1a] tracking-tight group-hover:text-[#EE4D2D] transition-colors">
-            TokoKita
+            {shopName}
           </span>
         </Link>
 
