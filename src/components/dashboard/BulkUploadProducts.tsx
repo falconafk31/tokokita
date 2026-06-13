@@ -33,7 +33,6 @@ export default function BulkUploadProducts() {
         // Map Excel headers to DB columns
         const formattedData = data.map((row: any) => ({
           name: row['Nama Produk'] || '',
-          description: row['Deskripsi'] || '',
           original_price: Number(row['Harga Asli']) || 0,
           price: Number(row['Harga Diskon']) || 0,
           category: row['Kategori'] || 'Lainnya',
@@ -64,7 +63,6 @@ export default function BulkUploadProducts() {
     const ws = XLSX.utils.json_to_sheet([
       {
         'Nama Produk': 'Contoh Baju SD',
-        'Deskripsi': 'Deskripsi singkat...',
         'Harga Asli': 150000,
         'Harga Diskon': 120000,
         'Kategori': 'Seragam',
