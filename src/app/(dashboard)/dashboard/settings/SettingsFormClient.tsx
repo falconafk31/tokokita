@@ -29,7 +29,7 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
     const file = e.target.files?.[0]
     if (!file) return
 
-    const toastId = toast('Sedang mengunggah...', 'loading')
+    const toastId = toast('Sedang mengunggah...', 'info')
     try {
       const formData = new FormData()
       formData.append('file', file)
