@@ -13,6 +13,7 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
     shop_name: initialData?.shop_name || 'TokoKita',
     fb_pixel_id: initialData?.fb_pixel_id || '',
     redirect_delay: initialData?.redirect_delay || 3,
+    favicon_url: initialData?.favicon_url || '',
   })
 
   const handleSave = async () => {
@@ -58,6 +59,23 @@ export default function SettingsFormClient({ initialData }: { initialData: any }
             onChange={e => setForm(p => ({ ...p, redirect_delay: e.target.value === '' ? '' : (parseInt(e.target.value) || 0) }))}
             className="w-full p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
           />
+        </div>
+
+        <div>
+          <label className="text-[13px] font-bold text-[#666] block mb-2">URL Favicon (Ikon Tab Browser)</label>
+          <input 
+            type="text" 
+            value={form.favicon_url}
+            onChange={e => setForm(p => ({ ...p, favicon_url: e.target.value }))}
+            placeholder="https://... (Opsional)"
+            className="w-full p-3 rounded-xl border border-[#e5e5e5] text-[14px] outline-none focus:border-[#FF7337]" 
+          />
+          {form.favicon_url && (
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-[12px] text-[#999] font-bold">Preview:</span>
+              <img src={form.favicon_url} alt="Favicon Preview" className="w-8 h-8 rounded-md border border-[#e5e5e5] object-contain bg-[#f9f9f9]" />
+            </div>
+          )}
         </div>
 
         <div className="pt-4">

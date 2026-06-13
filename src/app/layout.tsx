@@ -15,10 +15,22 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "TokoKita - Belanja Hemat Kualitas Premium",
-  description: "Semua produk langsung dari Shopee dengan harga terbaik",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const supabase = await createClient()
+  const { data: settings } = await supabase.from('settings').select('shop_name, favicon_url').eq('id', 1).single()
+
+  const shopName = settings?.shop_name || "TokoKita"
+
+  return {
+    title: `${shopName} - Belanja Hemat Kualitas Premium`,
+    description: "Semua produk langsung dari Shopee dengan harga terbaik",
+    icons: settings?.favicon_url ? {
+      icon: settings.favicon_url,
+      shortcut: settings.favicon_url,
+      apple: settings.favicon_url,
+    } : undefined
+  }
+}
 
 export default async function RootLayout({
   children,
